@@ -1,14 +1,15 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
+import { bookingService } from "@/services/api/bookingService";
+import ApperIcon from "@/components/ApperIcon";
+import BookingFlow from "@/components/organisms/BookingFlow";
+import Badge from "@/components/atoms/Badge";
 import Card from "@/components/atoms/Card";
 import Button from "@/components/atoms/Button";
-import Badge from "@/components/atoms/Badge";
-import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
-import ApperIcon from "@/components/ApperIcon";
-import { bookingService } from "@/services/api/bookingService";
+import Loading from "@/components/ui/Loading";
 
 const BookingsPage = () => {
 const [bookings, setBookings] = useState([]);
@@ -19,6 +20,7 @@ const [bookings, setBookings] = useState([]);
   const [editingBookingId, setEditingBookingId] = useState(null);
   const [editingMonthlyId, setEditingMonthlyId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
+  const [showBookingFlow, setShowBookingFlow] = useState(false);
 
   useEffect(() => {
     loadBookings();
@@ -133,6 +135,27 @@ const handleEditBooking = (booking) => {
     setEditingMonthlyId(null);
     setEditFormData({});
   };
+const handleNewBooking = () => {
+    setShowBookingFlow(true);
+  };
+
+  const handleBookingComplete = async (bookingData) => {
+    try {
+      await bookingService.createBooking({
+        pickupLocation: bookingData.pickupLocation?.name || bookingData.pickupLocation,
+        dropLocation: bookingData.dropLocation?.name || bookingData.dropLocation,
+        vehicleType: bookingData.vehicle?.name || bookingData.vehicleType,
+        scheduledTime: new Date().toISOString(),
+        estimatedFare: bookingData.vehicle?.price || bookingData.estimatedFare || 0
+      });
+      
+      setShowBookingFlow(false);
+      toast.success("Booking created successfully!");
+      await loadBookings(); // Refresh the bookings list
+    } catch (error) {
+      toast.error("Failed to create booking: " + error.message);
+    }
+  };
 
   const handleInputChange = (field, value) => {
     setEditFormData(prev => ({
@@ -175,9 +198,10 @@ const handleEditBooking = (booking) => {
             <h1 className="text-xl font-bold text-gray-900 font-display">My Bookings</h1>
             <p className="text-sm text-gray-600">Manage your rides and schedules</p>
           </div>
-          <Button
+<Button
             variant="primary"
             icon="Plus"
+            onClick={handleNewBooking}
             className="bg-gradient-to-r from-primary-600 to-primary-700"
           >
             New Booking
@@ -208,14 +232,14 @@ const handleEditBooking = (booking) => {
         </div>
       </div>
 
-      {/* Content */}
+{/* Content */}
       <div className="flex-1 overflow-y-auto p-4">
         {activeTab === "upcoming" && (
           <div className="space-y-4">
             {bookings.length === 0 ? (
               <Empty 
                 type="bookings" 
-                onAction={() => {}} 
+                onAction={handleNewBooking} 
                 actionLabel="Book a Ride"
               />
             ) : (
@@ -271,7 +295,7 @@ const handleEditBooking = (booking) => {
                           </div>
                         </div>
                       </div>
-</div>
+                    </div>
 
                     {/* Cancellation Policy Info */}
                     {booking.status === "confirmed" && (
@@ -574,7 +598,37 @@ const handleEditBooking = (booking) => {
           </div>
         )}
       </div>
+
+      {/* Booking Flow Modal */}
+      {showBookingFlow && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="p-4 border-b border-surface-200 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900 font-display">
+                New Booking
+              </h2>
+              <button
+                onClick={() => setShowBookingFlow(false)}
+                className="w-8 h-8 bg-surface-100 rounded-full flex items-center justify-center hover:bg-surface-200 transition-colors"
+              >
+                <ApperIcon name="X" size={20} className="text-gray-600" />
+              </button>
+            </div>
+            <div className="p-4">
+              <BookingFlow
+                onBookingComplete={handleBookingComplete}
+                className="max-w-none"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+<Empty 
+                type="bookings" 
+                onAction={handleNewBooking} 
+                actionLabel="Book a Ride"
+              />
   );
 };
 

@@ -41,7 +41,7 @@ class BookingService {
     return [...this.monthlyBookings];
   }
 
-  async createBooking(bookingData) {
+async createBooking(bookingData) {
     await this.delay(500);
     
     const newBooking = {
@@ -49,6 +49,7 @@ class BookingService {
       ...bookingData,
       status: "confirmed",
       createdAt: new Date().toISOString(),
+      scheduledTime: bookingData.scheduledTime || new Date(Date.now() + 30 * 60000).toISOString(), // Default to 30 minutes from now
       driver: this.getMockDriver() // Assign driver when booking is created
     };
     
