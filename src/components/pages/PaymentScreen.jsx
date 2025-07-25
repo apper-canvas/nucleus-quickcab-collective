@@ -146,12 +146,13 @@ function PaymentScreen({
   if (loading) return <Loading />;
   if (error) return <Error message={error} onRetry={loadPaymentData} />;
 
-  return (
-    <div className={`w-full max-w-md mx-auto ${className}`}>
+return (
+    <div className={`w-full max-w-md mx-auto px-4 sm:px-0 pb-20 sm:pb-6 ${className}`}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
+        className="space-y-4 sm:space-y-6 relative z-50"
+        style={{ minHeight: 'calc(100vh - 120px)' }}
       >
         {/* Header */}
         <div className="flex items-center space-x-3">

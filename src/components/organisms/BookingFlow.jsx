@@ -119,11 +119,10 @@ const handleBookRide = async () => {
       opacity: 0
     })
   };
-
-  return (
-    <div className={`max-w-md mx-auto ${className}`}>
+return (
+    <div className={`w-full max-w-md mx-auto px-4 sm:px-0 pb-safe ${className}`}>
       {/* Progress Indicator */}
-      <div className="flex items-center justify-center mb-6">
+      <div className="flex items-center justify-center mb-4 sm:mb-6">
         <div className="flex items-center space-x-4">
 {[1, 2, 3, 4].map((step) => (
             <div key={step} className="flex items-center">
@@ -145,9 +144,8 @@ const handleBookRide = async () => {
           ))}
         </div>
       </div>
-
-      {/* Step Content */}
-      <div className="relative h-[500px] overflow-hidden">
+{/* Step Content */}
+      <div className="relative min-h-[400px] max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-160px)] md:h-[500px] overflow-hidden">
         <AnimatePresence mode="wait">
           {currentStep === 1 && (
             <motion.div
@@ -159,8 +157,8 @@ const handleBookRide = async () => {
               transition={{ duration: 0.3 }}
 className="absolute inset-0"
             >
-              <Card className="p-6 h-full overflow-y-auto">
-                <div className="flex items-center space-x-2 mb-6">
+              <Card className="p-4 sm:p-6 h-full overflow-y-auto">
+                <div className="flex items-center space-x-2 mb-4 sm:mb-6">
                   <ApperIcon name="MapPin" size={24} className="text-primary-600" />
                   <h2 className="text-xl font-bold text-gray-900 font-display">
                     Where to?
@@ -207,11 +205,11 @@ className="absolute inset-0"
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ duration: 0.3 }}
+transition={{ duration: 0.3 }}
               className="absolute inset-0"
             >
-              <Card className="p-6 h-full overflow-y-auto">
-                <div className="flex items-center space-x-2 mb-6">
+              <Card className="p-4 sm:p-6 h-full overflow-y-auto">
+                <div className="flex items-center space-x-2 mb-4 sm:mb-6">
                   <ApperIcon name="Car" size={24} className="text-primary-600" />
                   <h2 className="text-xl font-bold text-gray-900 font-display">
                     Choose Vehicle
@@ -259,8 +257,8 @@ className="absolute inset-0"
               transition={{ duration: 0.3 }}
 className="absolute inset-0"
             >
-              <Card className="p-6 h-full overflow-y-auto">
-                <div className="flex items-center space-x-2 mb-6">
+              <Card className="p-4 sm:p-6 h-full overflow-y-auto">
+                <div className="flex items-center space-x-2 mb-4 sm:mb-6">
                   <ApperIcon name="CheckCircle" size={24} className="text-primary-600" />
                   <h2 className="text-xl font-bold text-gray-900 font-display">
                     Confirm Booking
