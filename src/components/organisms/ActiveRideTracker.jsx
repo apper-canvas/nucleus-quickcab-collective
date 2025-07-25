@@ -12,7 +12,8 @@ const ActiveRideTracker = ({ booking, onRideComplete, onCancelRide, className = 
   const [driver, setDriver] = useState(null);
   const [eta, setEta] = useState(booking?.vehicle?.eta || 5);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
-
+  const [timeRemaining, setTimeRemaining] = useState(15 * 60); // 15 minutes in seconds
+  const [bookingTime] = useState(new Date(booking?.createdAt || Date.now()));
   useEffect(() => {
     if (rideStatus === "searching") {
       // Simulate driver matching
@@ -57,7 +58,23 @@ const ActiveRideTracker = ({ booking, onRideComplete, onCancelRide, className = 
 
       return () => clearInterval(interval);
     }
-  }, [rideStatus]);
+}, [rideStatus]);
+
+  // Timer for 15-minute cancellation policy
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      const elapsed = Math.floor((now - bookingTime) / 1000); // seconds elapsed
+      const remaining = Math.max(0, (15 * 60) - elapsed); // 15 minutes - elapsed
+      setTimeRemaining(remaining);
+      
+      if (remaining <= 0) {
+        clearInterval(timer);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [bookingTime]);
 
   const getStatusConfig = () => {
     switch (rideStatus) {
@@ -104,9 +121,10 @@ const ActiveRideTracker = ({ booking, onRideComplete, onCancelRide, className = 
     }
   };
 
-  const handleCancelRide = () => {
-    const timeElapsed = 5; // Mock time elapsed in minutes
-    const isFreeCancel = timeElapsed <= 15;
+const handleCancelRide = () => {
+    const now = new Date();
+    const elapsedMinutes = Math.floor((now - bookingTime) / (1000 * 60)); // minutes elapsed
+    const isFreeCancel = elapsedMinutes < 15;
     
     if (!isFreeCancel) {
       setShowCancelDialog(true);
@@ -114,12 +132,12 @@ const ActiveRideTracker = ({ booking, onRideComplete, onCancelRide, className = 
     }
     
     onCancelRide?.();
-    toast.success("Ride cancelled successfully");
+    toast.success("Ride cancelled successfully - Free cancellation");
   };
 
-  const confirmCancellation = () => {
+const confirmCancellation = () => {
     onCancelRide?.();
-    toast.success("Ride cancelled. Cancellation fee applied.");
+    toast.success("Ride cancelled. Cancellation fee of $5 applied.");
     setShowCancelDialog(false);
   };
 
@@ -128,7 +146,7 @@ const ActiveRideTracker = ({ booking, onRideComplete, onCancelRide, className = 
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Status Header */}
-      <Card className="p-6">
+<Card className="p-6">
         <div className="flex items-center space-x-4 mb-4">
           <div className={`w-12 h-12 ${statusConfig.bg} rounded-full flex items-center justify-center`}>
             <ApperIcon name={statusConfig.icon} size={24} className={statusConfig.color} />
@@ -147,6 +165,19 @@ const ActiveRideTracker = ({ booking, onRideComplete, onCancelRide, className = 
             </div>
           )}
         </div>
+
+        {/* Free Cancellation Timer */}
+        {timeRemaining > 0 && (
+          <div className="flex items-center justify-between bg-accent-50 rounded-lg p-3 mb-3">
+            <div className="flex items-center space-x-2">
+              <ApperIcon name="Shield" size={16} className="text-accent-600" />
+              <span className="text-sm text-accent-700 font-medium">Free cancellation</span>
+            </div>
+            <Badge variant="success" size="sm">
+              {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
+            </Badge>
+          </div>
+        )}
 
         {eta > 0 && rideStatus !== "in_ride" && (
           <div className="flex items-center justify-between bg-surface-50 rounded-lg p-3">
@@ -238,7 +269,7 @@ const ActiveRideTracker = ({ booking, onRideComplete, onCancelRide, className = 
         )}
       </div>
 
-      {/* Cancel Dialog */}
+{/* Cancel Dialog */}
       {showCancelDialog && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -262,7 +293,7 @@ const ActiveRideTracker = ({ booking, onRideComplete, onCancelRide, className = 
             
             <div className="bg-red-50 rounded-lg p-3 mb-4">
               <div className="text-sm text-red-700">
-                Since it's been more than 15 minutes, a cancellation fee of $3.50 will be charged.
+                Since it's been more than 15 minutes, a cancellation fee of <strong>$5.00</strong> will be charged to your payment method.
               </div>
             </div>
             
@@ -279,7 +310,7 @@ const ActiveRideTracker = ({ booking, onRideComplete, onCancelRide, className = 
                 onClick={confirmCancellation}
                 className="flex-1"
               >
-                Cancel & Pay
+                Cancel & Pay $5
               </Button>
             </div>
           </motion.div>
