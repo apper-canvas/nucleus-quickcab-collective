@@ -10,7 +10,7 @@ import Empty from "@/components/ui/Empty";
 import Badge from "@/components/atoms/Badge";
 import Button from "@/components/atoms/Button";
 import Card from "@/components/atoms/Card";
-
+import DriverCard from "@/components/molecules/DriverCard";
 const BookingsPage = () => {
 const [bookings, setBookings] = useState([]);
   const [monthlyBookings, setMonthlyBookings] = useState([]);
@@ -308,9 +308,16 @@ const handleNewBooking = () => {
                           Free cancellation within 15 minutes of booking. After 15 minutes, a $5.00 cancellation fee applies.
                         </div>
                       </div>
+)}
+
+                    {/* Driver Information */}
+                    {booking.status === "confirmed" && booking.driver && (
+                      <div className="mb-4">
+                        <DriverCard driver={booking.driver} showCallButton={true} />
+                      </div>
                     )}
 
-{editingBookingId === booking.Id ? (
+                    {editingBookingId === booking.Id ? (
                       <div className="space-y-4">
                         <div className="grid grid-cols-1 gap-3">
                           <div>
