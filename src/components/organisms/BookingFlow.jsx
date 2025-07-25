@@ -157,9 +157,9 @@ const handleBookRide = async () => {
               animate="center"
               exit="exit"
               transition={{ duration: 0.3 }}
-              className="absolute inset-0"
+className="absolute inset-0"
             >
-              <Card className="p-6 h-full">
+              <Card className="p-6 h-full overflow-y-auto">
                 <div className="flex items-center space-x-2 mb-6">
                   <ApperIcon name="MapPin" size={24} className="text-primary-600" />
                   <h2 className="text-xl font-bold text-gray-900 font-display">
@@ -257,9 +257,9 @@ const handleBookRide = async () => {
               animate="center"
               exit="exit"
               transition={{ duration: 0.3 }}
-              className="absolute inset-0"
+className="absolute inset-0"
             >
-              <Card className="p-6 h-full">
+              <Card className="p-6 h-full overflow-y-auto">
                 <div className="flex items-center space-x-2 mb-6">
                   <ApperIcon name="CheckCircle" size={24} className="text-primary-600" />
                   <h2 className="text-xl font-bold text-gray-900 font-display">
