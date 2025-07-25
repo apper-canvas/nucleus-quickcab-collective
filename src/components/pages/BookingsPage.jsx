@@ -60,28 +60,37 @@ const handlePauseMonthly = async (monthlyId) => {
     }
   };
 
-  const handleModifyBooking = async (bookingId) => {
+const handleModifyBooking = async (bookingId) => {
     try {
       // For demo purposes, modify the scheduled time by adding 1 hour
+      const newTime = new Date(Date.now() + 60 * 60 * 1000);
       const modificationData = {
-        scheduledTime: new Date(Date.now() + 60 * 60 * 1000).toISOString()
+        scheduledTime: newTime.toISOString()
       };
       await bookingService.modifyBooking(bookingId, modificationData);
-      toast.success("Booking modified successfully");
+      const formattedTime = newTime.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+      toast.success(`Booking rescheduled for ${formattedTime}`);
       loadBookings();
     } catch (err) {
       toast.error("Failed to modify booking");
     }
   };
 
-  const handleModifyMonthly = async (monthlyId) => {
+const handleModifyMonthly = async (monthlyId) => {
     try {
       // For demo purposes, update the title
+      const newTitle = "Modified Monthly Booking";
       const modificationData = {
-        title: "Modified Monthly Booking"
+        title: newTitle
       };
       await bookingService.modifyMonthlyBooking(monthlyId, modificationData);
-      toast.success("Monthly booking modified successfully");
+      toast.success(`Monthly booking updated to "${newTitle}"`);
       loadBookings();
     } catch (err) {
       toast.error("Failed to modify monthly booking");
