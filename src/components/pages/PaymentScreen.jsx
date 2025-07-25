@@ -17,8 +17,9 @@ function PaymentScreen({
   onBack,
   className 
 }) {
-  const [paymentMethods, setPaymentMethods] = useState([]);
-const [selectedMethod, setSelectedMethod] = useState(null);
+const [paymentMethods, setPaymentMethods] = useState([]);
+  const [selectedMethod, setSelectedMethod] = useState(null);
+  const [methodsLoaded, setMethodsLoaded] = useState(false);
   const [showAddCard, setShowAddCard] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -33,30 +34,49 @@ const [selectedMethod, setSelectedMethod] = useState(null);
     cardholderName: ''
   });
 
-  useEffect(() => {
-    loadPaymentData();
-  }, []);
+useEffect(() => {
+    if (bookingData) {
+      loadPaymentData();
+    }
+  }, [bookingData]);
 
   const loadPaymentData = async () => {
     try {
       setLoading(true);
       setError(null);
+      setMethodsLoaded(false);
       
       const [methods, breakdown] = await Promise.all([
         paymentService.getPaymentMethods(),
         paymentService.calculateFare(bookingData)
       ]);
       
-      setPaymentMethods(methods);
+      console.log('Loaded payment methods:', methods); // Debug log
+      
+      if (methods && methods.length > 0) {
+        setPaymentMethods(methods);
+        setMethodsLoaded(true);
+        
+        // Auto-select default payment method
+        const defaultMethod = methods.find(m => m.isDefault);
+        if (defaultMethod) {
+          setSelectedMethod(defaultMethod);
+        } else {
+          // If no default, select the first method
+          setSelectedMethod(methods[0]);
+        }
+      } else {
+        setPaymentMethods([]);
+        setSelectedMethod(null);
+        toast.info("No payment methods found. Please add a payment method.");
+      }
+      
       setFareBreakdown(breakdown);
       
-      // Auto-select default payment method
-      const defaultMethod = methods.find(m => m.isDefault);
-      if (defaultMethod) {
-        setSelectedMethod(defaultMethod);
-      }
     } catch (err) {
-      setError(err.message);
+      console.error('Error loading payment data:', err);
+      setError(err.message || 'Failed to load payment information');
+      toast.error('Failed to load payment methods. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -275,56 +295,76 @@ return (
             </div>
 
 <div className="space-y-2">
-              {paymentMethods.map((method) => (
-                <motion.div
-                  key={method.Id}
-                  onClick={() => setSelectedMethod(method)}
-                  whileTap={{ scale: 0.98 }}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 ${
-                    selectedMethod?.Id === method.Id
-                      ? 'border-primary-500 bg-primary-50 shadow-md'
-                      : 'border-surface-200 hover:border-surface-300 hover:shadow-sm'
-                  }`}
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-lg ${
-                      selectedMethod?.Id === method.Id 
-                        ? 'bg-primary-100' 
-                        : 'bg-surface-100'
-                    }`}>
-                      <ApperIcon 
-                        name={getCardIcon(method.brand)} 
-                        size={20} 
-                        className={selectedMethod?.Id === method.Id ? 'text-primary-600' : 'text-gray-600'} 
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <div className={`font-medium ${
-                        selectedMethod?.Id === method.Id ? 'text-primary-900' : 'text-gray-900'
+              {!methodsLoaded && loading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                  <span className="ml-3 text-gray-600">Loading payment methods...</span>
+                </div>
+              ) : paymentMethods.length === 0 ? (
+                <div className="text-center py-8">
+                  <ApperIcon name="CreditCard" size={48} className="text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500 mb-4">No payment methods available</p>
+                  <Button
+                    variant="outline"
+                    onClick={() => toast.info("Add payment method functionality coming soon")}
+                    className="text-sm"
+                  >
+                    <ApperIcon name="Plus" size={16} className="mr-2" />
+                    Add Payment Method
+                  </Button>
+                </div>
+              ) : (
+                paymentMethods.map((method) => (
+                  <motion.div
+                    key={method.Id}
+                    onClick={() => setSelectedMethod(method)}
+                    whileTap={{ scale: 0.98 }}
+                    className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 ${
+                      selectedMethod?.Id === method.Id
+                        ? 'border-primary-500 bg-primary-50 shadow-md'
+                        : 'border-surface-200 hover:border-surface-300 hover:shadow-sm'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className={`p-2 rounded-lg ${
+                        selectedMethod?.Id === method.Id 
+                          ? 'bg-primary-100' 
+                          : 'bg-surface-100'
                       }`}>
-                        {formatCardNumber(method.cardNumber)}
+                        <ApperIcon 
+                          name={getCardIcon(method.brand)} 
+                          size={20} 
+                          className={selectedMethod?.Id === method.Id ? 'text-primary-600' : 'text-gray-600'} 
+                        />
                       </div>
-                      <div className="text-sm text-gray-600">
-                        {method.cardholderName} • {method.expiryDate}
+                      <div className="flex-1">
+                        <div className={`font-medium ${
+                          selectedMethod?.Id === method.Id ? 'text-primary-900' : 'text-gray-900'
+                        }`}>
+                          {formatCardNumber(method.cardNumber)}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {method.cardholderName} • {method.expiryDate}
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        {method.isDefault && (
+                          <Badge variant="success" size="sm">Default</Badge>
+                        )}
+                        {selectedMethod?.Id === method.Id && (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="p-1 rounded-full bg-primary-600"
+                          >
+                            <ApperIcon name="Check" size={12} className="text-white" />
+                          </motion.div>
+                        )}
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      {method.isDefault && (
-                        <Badge variant="success" size="sm">Default</Badge>
-                      )}
-                      {selectedMethod?.Id === method.Id && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="p-1 rounded-full bg-primary-600"
-                        >
-                          <ApperIcon name="Check" size={12} className="text-white" />
-                        </motion.div>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))
+              )}
             </div>
           </div>
         </Card>

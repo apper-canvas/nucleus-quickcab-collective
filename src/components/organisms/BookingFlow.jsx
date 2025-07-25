@@ -64,7 +64,7 @@ const handleBookRide = async () => {
     setIsBooking(true);
     
     try {
-      // Prepare booking data for payment
+      // Prepare comprehensive booking data for payment
       const booking = {
         id: Date.now(),
         pickupLocation,
@@ -72,14 +72,21 @@ const handleBookRide = async () => {
         vehicle: selectedVehicle,
         estimatedArrival: new Date(Date.now() + selectedVehicle.eta * 60000),
         fare: selectedVehicle.price,
-        status: "pending_payment"
+        status: "pending_payment",
+        createdAt: new Date().toISOString(),
+        // Additional data for payment processing
+        distance: "5.2 km", // Mock distance
+        duration: `${selectedVehicle.eta} min`
       };
+      
+      console.log('Preparing booking data for payment:', booking); // Debug log
       
       setBookingData(booking);
       setCurrentStep(4); // Move to payment step
       toast.success("Booking details confirmed! Please complete payment.");
       
     } catch (error) {
+      console.error('Booking preparation error:', error);
       toast.error("Booking failed. Please try again.");
     } finally {
       setIsBooking(false);

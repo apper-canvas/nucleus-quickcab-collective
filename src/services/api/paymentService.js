@@ -7,9 +7,18 @@ class PaymentService {
     this.transactions = [...mockTransactions];
   }
 
-  async getPaymentMethods() {
+async getPaymentMethods() {
     await this.delay(300);
-    return [...this.paymentMethods];
+    
+    // Ensure we always return a valid array
+    const methods = [...this.paymentMethods];
+    console.log('PaymentService returning methods:', methods); // Debug log
+    
+    if (methods.length === 0) {
+      console.warn('No payment methods found in service');
+    }
+    
+    return methods;
   }
 
   async getTransactions() {
