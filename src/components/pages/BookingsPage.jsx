@@ -43,10 +43,26 @@ const [bookings, setBookings] = useState([]);
     }
   };
 
-  const handleCancelBooking = async (bookingId) => {
+const handleCancelBooking = async (bookingId) => {
     try {
-      await bookingService.cancelBooking(bookingId);
-      toast.success("Booking cancelled successfully");
+      const result = await bookingService.cancelBooking(bookingId);
+      
+      // If confirmation is required for cancellation fee
+      if (result.requiresConfirmation) {
+        const confirmed = window.confirm(
+          `Cancellation fee of $${result.cancellationFee.toFixed(2)} will be charged. Do you want to proceed?`
+        );
+        
+        if (confirmed) {
+          await bookingService.cancelBooking(bookingId, true);
+          toast.success(`Booking cancelled. Cancellation fee of $${result.cancellationFee.toFixed(2)} applied.`);
+        } else {
+          return; // User cancelled the cancellation
+        }
+      } else {
+        toast.success("Booking cancelled successfully - Free cancellation");
+      }
+      
       loadBookings();
     } catch (err) {
       toast.error("Failed to cancel booking");
@@ -255,7 +271,20 @@ const handleEditBooking = (booking) => {
                           </div>
                         </div>
                       </div>
-                    </div>
+</div>
+
+                    {/* Cancellation Policy Info */}
+                    {booking.status === "confirmed" && (
+                      <div className="bg-blue-50 rounded-lg p-3 mb-4">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <ApperIcon name="Info" size={16} className="text-blue-600" />
+                          <span className="text-sm font-medium text-blue-900">Cancellation Policy</span>
+                        </div>
+                        <div className="text-xs text-blue-800">
+                          Free cancellation within 15 minutes of booking. After 15 minutes, a $5.00 cancellation fee applies.
+                        </div>
+                      </div>
+                    )}
 
 {editingBookingId === booking.Id ? (
                       <div className="space-y-4">

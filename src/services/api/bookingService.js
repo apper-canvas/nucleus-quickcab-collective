@@ -35,7 +35,7 @@ class BookingService {
     return { ...newBooking };
   }
 
-async cancelBooking(bookingId) {
+async cancelBooking(bookingId, forceCancellation = false) {
     await this.delay(400);
     
     const bookingIndex = this.bookings.findIndex(b => b.Id === bookingId);
@@ -43,13 +43,40 @@ async cancelBooking(bookingId) {
       throw new Error("Booking not found");
     }
     
+    const booking = this.bookings[bookingIndex];
+    const cancellationFee = this.calculateCancellationFee(booking);
+    
+    // If there's a fee and it's not a forced cancellation, return fee info
+    if (cancellationFee > 0 && !forceCancellation) {
+      return {
+        requiresConfirmation: true,
+        cancellationFee: cancellationFee,
+        booking: { ...booking }
+      };
+    }
+    
     this.bookings[bookingIndex] = {
       ...this.bookings[bookingIndex],
       status: "cancelled",
-      cancelledAt: new Date().toISOString()
+      cancelledAt: new Date().toISOString(),
+      cancellationFee: cancellationFee
     };
     
     return { ...this.bookings[bookingIndex] };
+  }
+
+  calculateCancellationFee(booking) {
+    const now = new Date();
+    const bookingTime = new Date(booking.createdAt);
+    const elapsedMinutes = Math.floor((now - bookingTime) / (1000 * 60));
+    
+    // Free cancellation within 15 minutes
+    if (elapsedMinutes < 15) {
+      return 0;
+    }
+    
+    // $5 cancellation fee after 15 minutes
+    return 5;
   }
 
   async modifyBooking(bookingId, modificationData) {
