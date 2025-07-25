@@ -622,13 +622,8 @@ const handleNewBooking = () => {
             </div>
           </div>
         </div>
-      )}
+)}
     </div>
-<Empty 
-                type="bookings" 
-                onAction={handleNewBooking} 
-                actionLabel="Book a Ride"
-              />
   );
 };
 
