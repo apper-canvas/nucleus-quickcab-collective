@@ -1,0 +1,65 @@
+[
+  {
+    "Id": 1,
+    "type": "ride",
+    "description": "Ride to Airport Terminal A",
+    "amount": 18.50,
+    "status": "completed",
+    "timestamp": "2024-01-10T15:45:00Z",
+    "paymentMethod": "Visa •••• 9012"
+  },
+  {
+    "Id": 2,
+    "type": "ride",
+    "description": "Ride to Home",
+    "amount": 12.75,
+    "status": "completed",
+    "timestamp": "2024-01-08T18:20:00Z",
+    "paymentMethod": "Mastercard •••• 2222"
+  },
+  {
+    "Id": 3,
+    "type": "cancellation",
+    "description": "Cancellation fee - Late cancellation",
+    "amount": 3.50,
+    "status": "completed",
+    "timestamp": "2024-01-06T14:30:00Z",
+    "paymentMethod": "Visa •••• 9012"
+  },
+  {
+    "Id": 4,
+    "type": "ride",
+    "description": "Ride to Restaurant District",
+    "amount": 15.25,
+    "status": "completed",
+    "timestamp": "2024-01-05T19:30:00Z",
+    "paymentMethod": "Visa •••• 9012"
+  },
+  {
+    "Id": 5,
+    "type": "refund",
+    "description": "Refund for cancelled ride",
+    "amount": 9.50,
+    "status": "completed",
+    "timestamp": "2024-01-03T12:00:00Z",
+    "paymentMethod": "Visa •••• 9012"
+  },
+  {
+    "Id": 6,
+    "type": "monthly",
+    "description": "Monthly subscription - Office commute",
+    "amount": 280.00,
+    "status": "completed",
+    "timestamp": "2024-01-01T00:00:00Z",
+    "paymentMethod": "Mastercard •••• 2222"
+  },
+  {
+    "Id": 7,
+    "type": "ride",
+    "description": "Ride to Student Housing",
+    "amount": 7.25,
+    "status": "completed",
+    "timestamp": "2023-12-28T14:45:00Z",
+    "paymentMethod": "American Express •••• 0005"
+  }
+]

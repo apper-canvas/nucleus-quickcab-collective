@@ -1,0 +1,29 @@
+[
+  {
+    "Id": 1,
+    "cardNumber": "4532123456789012",
+    "expiryDate": "12/26",
+    "cardholderName": "John Doe",
+    "brand": "visa",
+    "isDefault": true,
+    "createdAt": "2023-11-15T10:30:00Z"
+  },
+  {
+    "Id": 2,
+    "cardNumber": "5555444433332222",
+    "expiryDate": "08/25",
+    "cardholderName": "John Doe",
+    "brand": "mastercard",
+    "isDefault": false,
+    "createdAt": "2023-12-01T16:20:00Z"
+  },
+  {
+    "Id": 3,
+    "cardNumber": "378282246310005",
+    "expiryDate": "03/27",
+    "cardholderName": "John Doe",
+    "brand": "amex",
+    "isDefault": false,
+    "createdAt": "2024-01-05T09:45:00Z"
+  }
+]

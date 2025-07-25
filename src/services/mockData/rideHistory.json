@@ -1,0 +1,92 @@
+[
+  {
+    "Id": 1,
+    "pickupLocation": "Downtown Plaza - 123 Main Street",
+    "dropLocation": "Airport Terminal A - Gate 15",
+    "vehicleType": "QuickEco",
+    "finalFare": 18.50,
+    "distance": 12.3,
+    "duration": 28,
+    "completedAt": "2024-01-10T15:45:00Z",
+    "status": "completed",
+    "rating": 4.8,
+    "driver": {
+      "name": "Alex Johnson",
+      "photo": "/api/placeholder/40/40",
+      "vehicle": "Toyota Camry",
+      "licensePlate": "ABC-123"
+    }
+  },
+  {
+    "Id": 2,
+    "pickupLocation": "Central Mall - 456 Shopping District",
+    "dropLocation": "Home - 789 Residential Ave",
+    "vehicleType": "QuickComfort",
+    "finalFare": 12.75,
+    "distance": 8.7,
+    "duration": 22,
+    "completedAt": "2024-01-08T18:20:00Z",
+    "status": "completed",
+    "rating": 5.0,
+    "driver": {
+      "name": "Sarah Williams",
+      "photo": "/api/placeholder/40/40",
+      "vehicle": "Honda Accord",
+      "licensePlate": "XYZ-789"
+    }
+  },
+  {
+    "Id": 3,
+    "pickupLocation": "Office Tower - 456 Business Blvd",
+    "dropLocation": "Restaurant District - 321 Food Ave",
+    "vehicleType": "QuickXL",
+    "finalFare": 15.25,
+    "distance": 6.2,
+    "duration": 18,
+    "completedAt": "2024-01-05T19:30:00Z",
+    "status": "completed",
+    "rating": 4.5,
+    "driver": {
+      "name": "Mike Chen",
+      "photo": "/api/placeholder/40/40",
+      "vehicle": "Chevrolet Suburban",
+      "licensePlate": "DEF-456"
+    }
+  },
+  {
+    "Id": 4,
+    "pickupLocation": "Train Station - Platform 2",
+    "dropLocation": "Hotel District - 555 Hospitality Blvd",
+    "vehicleType": "QuickEco",
+    "finalFare": 9.50,
+    "distance": 4.1,
+    "duration": 12,
+    "completedAt": "2024-01-03T11:15:00Z",
+    "status": "cancelled",
+    "rating": 0,
+    "driver": {
+      "name": "Jessica Brown",
+      "photo": "/api/placeholder/40/40",
+      "vehicle": "Nissan Sentra",
+      "licensePlate": "GHI-789"
+    }
+  },
+  {
+    "Id": 5,
+    "pickupLocation": "University Campus - Building A",
+    "dropLocation": "Student Housing - 888 College Ave",
+    "vehicleType": "QuickComfort",
+    "finalFare": 7.25,
+    "distance": 2.8,
+    "duration": 8,
+    "completedAt": "2023-12-28T14:45:00Z",
+    "status": "completed",
+    "rating": 4.9,
+    "driver": {
+      "name": "David Martinez",
+      "photo": "/api/placeholder/40/40",
+      "vehicle": "Ford Focus",
+      "licensePlate": "JKL-012"
+    }
+  }
+]
