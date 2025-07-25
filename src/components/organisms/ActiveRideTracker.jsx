@@ -192,9 +192,9 @@ const confirmCancellation = () => {
         )}
       </Card>
 
-      {/* Driver Information */}
-      {driver && rideStatus !== "searching" && (
-        <DriverCard driver={driver} />
+{/* Driver Information */}
+      {driver && (rideStatus === "driver_assigned" || rideStatus === "driver_arriving" || rideStatus === "in_progress") && (
+        <DriverCard driver={driver} showCallButton={true} />
       )}
 
       {/* Trip Details */}

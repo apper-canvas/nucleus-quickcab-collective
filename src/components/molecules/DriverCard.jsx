@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 import Card from "@/components/atoms/Card";
 import Button from "@/components/atoms/Button";
 import Badge from "@/components/atoms/Badge";
@@ -17,7 +18,7 @@ const DriverCard = ({
 
   const handleCall = () => {
     // In a real app, this would initiate a call
-    console.log("Calling driver:", driver.phone);
+    toast.success(`Calling ${driver.name} at ${driver.phone}`);
   };
 
   return (
@@ -59,8 +60,8 @@ const DriverCard = ({
               </span>
             </div>
             
-            <div className="text-sm text-gray-600">
-              {driver.vehicle.make} {driver.vehicle.model} • {driver.vehicle.licensePlate}
+<div className="text-sm text-gray-600">
+              {driver.vehicle.color} {driver.vehicle.make} {driver.vehicle.model} • {driver.vehicle.licensePlate}
             </div>
           </div>
         </div>

@@ -9,6 +9,26 @@ class BookingService {
     this.monthlyBookings = [...mockMonthlyBookings];
   }
 
+  // Mock driver data for assignment simulation
+  getMockDriver() {
+    return {
+      id: "driver-1",
+      name: "Alex Johnson", 
+      photo: "/api/placeholder/64/64",
+      rating: 4.8,
+      totalRides: 1247,
+      phone: "+1 (555) 123-4567",
+      vehicle: {
+        make: "Toyota",
+        model: "Camry", 
+        color: "Silver",
+        licensePlate: "ABC-123"
+      },
+      eta: 3,
+      distance: 0.8
+    };
+  }
+
   async getUpcomingBookings() {
     await this.delay(300);
     return [...this.bookings].filter(booking => 
@@ -28,7 +48,8 @@ class BookingService {
       Id: this.getNextId(this.bookings),
       ...bookingData,
       status: "confirmed",
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      driver: this.getMockDriver() // Assign driver when booking is created
     };
     
     this.bookings.push(newBooking);
