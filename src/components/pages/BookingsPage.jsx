@@ -4,12 +4,12 @@ import { toast } from "react-toastify";
 import { bookingService } from "@/services/api/bookingService";
 import ApperIcon from "@/components/ApperIcon";
 import BookingFlow from "@/components/organisms/BookingFlow";
-import Badge from "@/components/atoms/Badge";
-import Card from "@/components/atoms/Card";
-import Button from "@/components/atoms/Button";
+import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
-import Loading from "@/components/ui/Loading";
+import Badge from "@/components/atoms/Badge";
+import Button from "@/components/atoms/Button";
+import Card from "@/components/atoms/Card";
 
 const BookingsPage = () => {
 const [bookings, setBookings] = useState([]);
