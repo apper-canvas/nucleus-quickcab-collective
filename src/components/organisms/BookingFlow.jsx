@@ -7,14 +7,15 @@ import Button from "@/components/atoms/Button";
 import Card from "@/components/atoms/Card";
 import Badge from "@/components/atoms/Badge";
 import ApperIcon from "@/components/ApperIcon";
+import PaymentScreen from "@/components/pages/PaymentScreen";
 
 const BookingFlow = ({ onBookingComplete, className = "" }) => {
-  const [currentStep, setCurrentStep] = useState(1);
+const [currentStep, setCurrentStep] = useState(1);
   const [pickupLocation, setPickupLocation] = useState(null);
   const [dropLocation, setDropLocation] = useState(null);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [isBooking, setIsBooking] = useState(false);
-
+  const [bookingData, setBookingData] = useState(null);
   const vehicles = [
     {
       id: 1,
@@ -59,13 +60,11 @@ const BookingFlow = ({ onBookingComplete, className = "" }) => {
     setCurrentStep(prev => prev + 1);
   };
 
-  const handleBookRide = async () => {
+const handleBookRide = async () => {
     setIsBooking(true);
     
     try {
-      // Simulate booking API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      // Prepare booking data for payment
       const booking = {
         id: Date.now(),
         pickupLocation,
@@ -73,17 +72,28 @@ const BookingFlow = ({ onBookingComplete, className = "" }) => {
         vehicle: selectedVehicle,
         estimatedArrival: new Date(Date.now() + selectedVehicle.eta * 60000),
         fare: selectedVehicle.price,
-        status: "searching"
+        status: "pending_payment"
       };
       
-      toast.success("Booking confirmed! Searching for driver...");
-      onBookingComplete?.(booking);
+      setBookingData(booking);
+      setCurrentStep(4); // Move to payment step
+      toast.success("Booking details confirmed! Please complete payment.");
       
     } catch (error) {
       toast.error("Booking failed. Please try again.");
     } finally {
       setIsBooking(false);
     }
+  };
+
+  const handlePaymentComplete = (finalBookingData) => {
+    onBookingComplete?.(finalBookingData);
+    resetBooking();
+  };
+
+  const handlePaymentBack = () => {
+    setCurrentStep(3);
+    setBookingData(null);
   };
 
   const resetBooking = () => {
@@ -115,7 +125,7 @@ const BookingFlow = ({ onBookingComplete, className = "" }) => {
       {/* Progress Indicator */}
       <div className="flex items-center justify-center mb-6">
         <div className="flex items-center space-x-4">
-          {[1, 2, 3].map((step) => (
+{[1, 2, 3, 4].map((step) => (
             <div key={step} className="flex items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center font-medium text-sm transition-all duration-200 ${
                 step < currentStep 
@@ -126,7 +136,7 @@ const BookingFlow = ({ onBookingComplete, className = "" }) => {
               }`}>
                 {step < currentStep ? <ApperIcon name="Check" size={16} /> : step}
               </div>
-              {step < 3 && (
+              {step < 4 && (
                 <div className={`w-8 h-0.5 mx-2 transition-all duration-200 ${
                   step < currentStep ? "bg-accent-500" : "bg-surface-200"
                 }`} />
@@ -239,7 +249,7 @@ const BookingFlow = ({ onBookingComplete, className = "" }) => {
             </motion.div>
           )}
 
-          {currentStep === 3 && (
+{currentStep === 3 && (
             <motion.div
               key="confirm"
               variants={stepVariants}
@@ -321,11 +331,29 @@ const BookingFlow = ({ onBookingComplete, className = "" }) => {
                       loading={isBooking}
                       className="flex-1"
                     >
-                      {isBooking ? "Booking..." : "Book Ride"}
+                      {isBooking ? "Preparing..." : "Continue to Payment"}
                     </Button>
                   </div>
                 </div>
               </Card>
+            </motion.div>
+          )}
+
+          {currentStep === 4 && bookingData && (
+            <motion.div
+              key="payment"
+              variants={stepVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.3 }}
+              className="absolute inset-0"
+            >
+              <PaymentScreen
+                bookingData={bookingData}
+                onPaymentComplete={handlePaymentComplete}
+                onBack={handlePaymentBack}
+              />
             </motion.div>
           )}
         </AnimatePresence>

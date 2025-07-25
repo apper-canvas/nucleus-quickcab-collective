@@ -72,6 +72,22 @@ class PaymentService {
     return { ...method };
   }
 
+async calculateFare(bookingData) {
+    await this.delay(300);
+    
+    const baseFare = bookingData.vehicle?.price || bookingData.fare || 15.00;
+    const serviceFee = baseFare * 0.1; // 10% service fee
+    const tax = (baseFare + serviceFee) * 0.08; // 8% tax
+    const total = baseFare + serviceFee + tax;
+    
+    return {
+      baseFare,
+      serviceFee,
+      tax,
+      total
+    };
+  }
+
   async processPayment(paymentData) {
     await this.delay(800);
     

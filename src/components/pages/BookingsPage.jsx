@@ -139,24 +139,16 @@ const handleNewBooking = () => {
     setShowBookingFlow(true);
   };
 
-  const handleBookingComplete = async (bookingData) => {
+const handleBookingComplete = async (bookingData) => {
     try {
-      await bookingService.createBooking({
-        pickupLocation: bookingData.pickupLocation?.name || bookingData.pickupLocation,
-        dropLocation: bookingData.dropLocation?.name || bookingData.dropLocation,
-        vehicleType: bookingData.vehicle?.name || bookingData.vehicleType,
-        scheduledTime: new Date().toISOString(),
-        estimatedFare: bookingData.vehicle?.price || bookingData.estimatedFare || 0
-      });
-      
+      // Booking is already created in payment flow, just update UI
       setShowBookingFlow(false);
-      toast.success("Booking created successfully!");
+      toast.success("Booking completed successfully!");
       await loadBookings(); // Refresh the bookings list
     } catch (error) {
-      toast.error("Failed to create booking: " + error.message);
+      toast.error("Failed to complete booking: " + error.message);
     }
   };
-
   const handleInputChange = (field, value) => {
     setEditFormData(prev => ({
       ...prev,
