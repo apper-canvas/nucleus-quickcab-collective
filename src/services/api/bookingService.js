@@ -1,5 +1,7 @@
-import mockBookings from "@/services/mockData/bookings.json";
+import React from "react";
 import mockMonthlyBookings from "@/services/mockData/monthlyBookings.json";
+import mockBookings from "@/services/mockData/bookings.json";
+import Error from "@/components/ui/Error";
 
 class BookingService {
   constructor() {
@@ -33,7 +35,7 @@ class BookingService {
     return { ...newBooking };
   }
 
-  async cancelBooking(bookingId) {
+async cancelBooking(bookingId) {
     await this.delay(400);
     
     const bookingIndex = this.bookings.findIndex(b => b.Id === bookingId);
@@ -45,6 +47,23 @@ class BookingService {
       ...this.bookings[bookingIndex],
       status: "cancelled",
       cancelledAt: new Date().toISOString()
+    };
+    
+    return { ...this.bookings[bookingIndex] };
+  }
+
+  async modifyBooking(bookingId, modificationData) {
+    await this.delay(400);
+    
+    const bookingIndex = this.bookings.findIndex(b => b.Id === bookingId);
+    if (bookingIndex === -1) {
+      throw new Error("Booking not found");
+    }
+    
+    this.bookings[bookingIndex] = {
+      ...this.bookings[bookingIndex],
+      ...modificationData,
+      modifiedAt: new Date().toISOString()
     };
     
     return { ...this.bookings[bookingIndex] };
@@ -65,8 +84,7 @@ class BookingService {
     
     return { ...this.monthlyBookings[monthlyIndex] };
   }
-
-  async createMonthlyBooking(monthlyData) {
+async createMonthlyBooking(monthlyData) {
     await this.delay(500);
     
     const newMonthly = {
@@ -80,10 +98,26 @@ class BookingService {
     return { ...newMonthly };
   }
 
-  getNextId(array) {
-    return Math.max(...array.map(item => item.Id), 0) + 1;
+  async modifyMonthlyBooking(monthlyId, modificationData) {
+    await this.delay(400);
+    
+    const monthlyIndex = this.monthlyBookings.findIndex(m => m.Id === monthlyId);
+    if (monthlyIndex === -1) {
+      throw new Error("Monthly booking not found");
+    }
+    
+    this.monthlyBookings[monthlyIndex] = {
+      ...this.monthlyBookings[monthlyIndex],
+      ...modificationData,
+      modifiedAt: new Date().toISOString()
+    };
+    
+    return { ...this.monthlyBookings[monthlyIndex] };
   }
 
+getNextId(array) {
+    return Math.max(...array.map(item => item.Id), 0) + 1;
+  }
   async delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }

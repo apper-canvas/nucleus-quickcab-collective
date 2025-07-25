@@ -50,13 +50,41 @@ const BookingsPage = () => {
     }
   };
 
-  const handlePauseMonthly = async (monthlyId) => {
+const handlePauseMonthly = async (monthlyId) => {
     try {
       await bookingService.pauseMonthlyBooking(monthlyId);
       toast.success("Monthly booking paused");
       loadBookings();
     } catch (err) {
       toast.error("Failed to pause monthly booking");
+    }
+  };
+
+  const handleModifyBooking = async (bookingId) => {
+    try {
+      // For demo purposes, modify the scheduled time by adding 1 hour
+      const modificationData = {
+        scheduledTime: new Date(Date.now() + 60 * 60 * 1000).toISOString()
+      };
+      await bookingService.modifyBooking(bookingId, modificationData);
+      toast.success("Booking modified successfully");
+      loadBookings();
+    } catch (err) {
+      toast.error("Failed to modify booking");
+    }
+  };
+
+  const handleModifyMonthly = async (monthlyId) => {
+    try {
+      // For demo purposes, update the title
+      const modificationData = {
+        title: "Modified Monthly Booking"
+      };
+      await bookingService.modifyMonthlyBooking(monthlyId, modificationData);
+      toast.success("Monthly booking modified successfully");
+      loadBookings();
+    } catch (err) {
+      toast.error("Failed to modify monthly booking");
     }
   };
 
@@ -193,10 +221,11 @@ const BookingsPage = () => {
                     </div>
 
                     <div className="flex space-x-2">
-                      <Button
+<Button
                         variant="outline"
                         size="sm"
                         icon="Edit"
+                        onClick={() => handleModifyBooking(booking.Id)}
                         className="flex-1"
                       >
                         Modify
@@ -287,10 +316,11 @@ const BookingsPage = () => {
                     </div>
 
                     <div className="flex space-x-2">
-                      <Button
+<Button
                         variant="outline"
                         size="sm"
                         icon="Edit"
+                        onClick={() => handleModifyMonthly(monthly.Id)}
                         className="flex-1"
                       >
                         Edit Schedule
