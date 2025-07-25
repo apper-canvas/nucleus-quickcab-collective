@@ -88,12 +88,28 @@ async calculateFare(bookingData) {
     };
   }
 
-  async processPayment(paymentData) {
+async processPayment(paymentData) {
     await this.delay(800);
+    
+    // Validate payment method exists
+    const paymentMethod = this.paymentMethods.find(method => method.Id === paymentData.paymentMethodId);
+    if (!paymentMethod) {
+      throw new Error('Invalid payment method selected');
+    }
+    
+    // Simulate potential payment failures (5% chance)
+    if (Math.random() < 0.05) {
+      throw new Error('Payment processing failed. Please try again.');
+    }
     
     const transaction = {
       Id: this.getNextId(this.transactions),
       ...paymentData,
+      paymentMethodInfo: {
+        cardNumber: paymentMethod.cardNumber,
+        brand: paymentMethod.brand,
+        cardholderName: paymentMethod.cardholderName
+      },
       status: "completed",
       timestamp: new Date().toISOString()
     };

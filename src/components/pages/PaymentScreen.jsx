@@ -18,7 +18,7 @@ function PaymentScreen({
   className 
 }) {
   const [paymentMethods, setPaymentMethods] = useState([]);
-  const [selectedMethod, setSelectedMethod] = useState(null);
+const [selectedMethod, setSelectedMethod] = useState(null);
   const [showAddCard, setShowAddCard] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -82,7 +82,7 @@ function PaymentScreen({
     }
   };
 
-  const handlePayment = async () => {
+const handlePayment = async () => {
     if (!selectedMethod) {
       toast.error('Please select a payment method');
       return;
@@ -274,39 +274,56 @@ return (
               </Button>
             </div>
 
-            <div className="space-y-2">
+<div className="space-y-2">
               {paymentMethods.map((method) => (
-                <div
+                <motion.div
                   key={method.Id}
                   onClick={() => setSelectedMethod(method)}
-                  className={`p-3 rounded-lg border cursor-pointer transition-all ${
+                  whileTap={{ scale: 0.98 }}
+                  className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 ${
                     selectedMethod?.Id === method.Id
-                      ? 'border-primary-500 bg-primary-50'
-                      : 'border-surface-200 hover:border-surface-300'
+                      ? 'border-primary-500 bg-primary-50 shadow-md'
+                      : 'border-surface-200 hover:border-surface-300 hover:shadow-sm'
                   }`}
                 >
                   <div className="flex items-center space-x-3">
-                    <ApperIcon 
-                      name={getCardIcon(method.brand)} 
-                      size={20} 
-                      className="text-gray-600" 
-                    />
+                    <div className={`p-2 rounded-lg ${
+                      selectedMethod?.Id === method.Id 
+                        ? 'bg-primary-100' 
+                        : 'bg-surface-100'
+                    }`}>
+                      <ApperIcon 
+                        name={getCardIcon(method.brand)} 
+                        size={20} 
+                        className={selectedMethod?.Id === method.Id ? 'text-primary-600' : 'text-gray-600'} 
+                      />
+                    </div>
                     <div className="flex-1">
-                      <div className="font-medium text-gray-900">
+                      <div className={`font-medium ${
+                        selectedMethod?.Id === method.Id ? 'text-primary-900' : 'text-gray-900'
+                      }`}>
                         {formatCardNumber(method.cardNumber)}
                       </div>
                       <div className="text-sm text-gray-600">
                         {method.cardholderName} • {method.expiryDate}
                       </div>
                     </div>
-                    {method.isDefault && (
-                      <Badge variant="success" size="sm">Default</Badge>
-                    )}
-                    {selectedMethod?.Id === method.Id && (
-                      <ApperIcon name="Check" size={16} className="text-primary-600" />
-                    )}
+                    <div className="flex items-center space-x-2">
+                      {method.isDefault && (
+                        <Badge variant="success" size="sm">Default</Badge>
+                      )}
+                      {selectedMethod?.Id === method.Id && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="p-1 rounded-full bg-primary-600"
+                        >
+                          <ApperIcon name="Check" size={12} className="text-white" />
+                        </motion.div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -382,18 +399,28 @@ return (
         )}
 
         {/* Payment Button */}
-        <div className="space-y-3">
+<div className="space-y-3">
           <Button
             onClick={handlePayment}
             loading={isProcessing}
             disabled={!selectedMethod || isProcessing}
-            className="w-full"
+            className={`w-full transition-all duration-200 ${
+              selectedMethod && !isProcessing
+                ? 'bg-primary-600 hover:bg-primary-700 shadow-lg hover:shadow-xl'
+                : ''
+            }`}
             size="lg"
           >
-            {isProcessing 
-              ? 'Processing Payment...' 
-              : `Pay $${fareBreakdown?.total.toFixed(2) || '0.00'}`
-            }
+            {isProcessing ? (
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Processing Payment...</span>
+              </div>
+            ) : !selectedMethod ? (
+              'Select Payment Method'
+            ) : (
+              `Pay $${fareBreakdown?.total.toFixed(2) || '0.00'}`
+            )}
           </Button>
           
           <p className="text-xs text-gray-500 text-center">
