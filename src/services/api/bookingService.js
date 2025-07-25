@@ -1,4 +1,4 @@
-import React from "react";
+// BookingService - handles all booking-related operations
 import mockMonthlyBookings from "@/services/mockData/monthlyBookings.json";
 import mockBookings from "@/services/mockData/bookings.json";
 import Error from "@/components/ui/Error";

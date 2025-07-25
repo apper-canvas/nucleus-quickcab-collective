@@ -11,11 +11,14 @@ import ApperIcon from "@/components/ApperIcon";
 import { bookingService } from "@/services/api/bookingService";
 
 const BookingsPage = () => {
-  const [bookings, setBookings] = useState([]);
+const [bookings, setBookings] = useState([]);
   const [monthlyBookings, setMonthlyBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("upcoming");
+  const [editingBookingId, setEditingBookingId] = useState(null);
+  const [editingMonthlyId, setEditingMonthlyId] = useState(null);
+  const [editFormData, setEditFormData] = useState({});
 
   useEffect(() => {
     loadBookings();
@@ -60,41 +63,66 @@ const handlePauseMonthly = async (monthlyId) => {
     }
   };
 
-const handleModifyBooking = async (bookingId) => {
+const handleEditBooking = (booking) => {
+    setEditingBookingId(booking.Id);
+    setEditFormData({
+      pickupLocation: booking.pickupLocation,
+      dropLocation: booking.dropLocation,
+      scheduledTime: new Date(booking.scheduledTime).toISOString().slice(0, 16),
+      vehicleType: booking.vehicleType
+    });
+  };
+
+  const handleEditMonthly = (monthly) => {
+    setEditingMonthlyId(monthly.Id);
+    setEditFormData({
+      title: monthly.title,
+      pickupLocation: monthly.pickupLocation,
+      dropLocation: monthly.dropLocation,
+      schedule: monthly.schedule,
+      frequency: monthly.frequency
+    });
+  };
+
+  const handleSaveBooking = async (bookingId) => {
     try {
-      // For demo purposes, modify the scheduled time by adding 1 hour
-      const newTime = new Date(Date.now() + 60 * 60 * 1000);
       const modificationData = {
-        scheduledTime: newTime.toISOString()
+        ...editFormData,
+        scheduledTime: new Date(editFormData.scheduledTime).toISOString()
       };
       await bookingService.modifyBooking(bookingId, modificationData);
-      const formattedTime = newTime.toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-      });
-      toast.success(`Booking rescheduled for ${formattedTime}`);
+      toast.success("Booking updated successfully");
+      setEditingBookingId(null);
+      setEditFormData({});
       loadBookings();
     } catch (err) {
-      toast.error("Failed to modify booking");
+      toast.error("Failed to update booking");
     }
   };
 
-const handleModifyMonthly = async (monthlyId) => {
+  const handleSaveMonthly = async (monthlyId) => {
     try {
-      // For demo purposes, update the title
-      const newTitle = "Modified Monthly Booking";
-      const modificationData = {
-        title: newTitle
-      };
-      await bookingService.modifyMonthlyBooking(monthlyId, modificationData);
-      toast.success(`Monthly booking updated to "${newTitle}"`);
+      await bookingService.modifyMonthlyBooking(monthlyId, editFormData);
+      toast.success("Monthly booking updated successfully");
+      setEditingMonthlyId(null);
+      setEditFormData({});
       loadBookings();
     } catch (err) {
-      toast.error("Failed to modify monthly booking");
+      toast.error("Failed to update monthly booking");
     }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingBookingId(null);
+    setEditingMonthlyId(null);
+    setEditFormData({});
+  };
+
+  const handleInputChange = (field, value) => {
+    setEditFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const getStatusBadge = (status) => {
@@ -229,26 +257,102 @@ const handleModifyMonthly = async (monthlyId) => {
                       </div>
                     </div>
 
-                    <div className="flex space-x-2">
-<Button
-                        variant="outline"
-                        size="sm"
-                        icon="Edit"
-                        onClick={() => handleModifyBooking(booking.Id)}
-                        className="flex-1"
-                      >
-                        Modify
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        icon="X"
-                        onClick={() => handleCancelBooking(booking.Id)}
-                        className="flex-1 text-red-600 border-red-200 hover:bg-red-50"
-                      >
-                        Cancel
-                      </Button>
-                    </div>
+{editingBookingId === booking.Id ? (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 gap-3">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Pickup Location
+                            </label>
+                            <input
+                              type="text"
+                              value={editFormData.pickupLocation || ''}
+                              onChange={(e) => handleInputChange('pickupLocation', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                              placeholder="Enter pickup location"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Drop Location
+                            </label>
+                            <input
+                              type="text"
+                              value={editFormData.dropLocation || ''}
+                              onChange={(e) => handleInputChange('dropLocation', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                              placeholder="Enter drop location"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Scheduled Time
+                            </label>
+                            <input
+                              type="datetime-local"
+                              value={editFormData.scheduledTime || ''}
+                              onChange={(e) => handleInputChange('scheduledTime', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Vehicle Type
+                            </label>
+                            <select
+                              value={editFormData.vehicleType || ''}
+                              onChange={(e) => handleInputChange('vehicleType', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                            >
+                              <option value="QuickEco">QuickEco</option>
+                              <option value="QuickComfort">QuickComfort</option>
+                              <option value="QuickXL">QuickXL</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            icon="Check"
+                            onClick={() => handleSaveBooking(booking.Id)}
+                            className="flex-1"
+                          >
+                            Save Changes
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            icon="X"
+                            onClick={handleCancelEdit}
+                            className="flex-1"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          icon="Edit"
+                          onClick={() => handleEditBooking(booking)}
+                          className="flex-1"
+                        >
+                          Modify
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          icon="X"
+                          onClick={() => handleCancelBooking(booking.Id)}
+                          className="flex-1 text-red-600 border-red-200 hover:bg-red-50"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    )}
                   </Card>
                 </motion.div>
               ))
@@ -324,26 +428,116 @@ const handleModifyMonthly = async (monthlyId) => {
                       </div>
                     </div>
 
-                    <div className="flex space-x-2">
-<Button
-                        variant="outline"
-                        size="sm"
-                        icon="Edit"
-                        onClick={() => handleModifyMonthly(monthly.Id)}
-                        className="flex-1"
-                      >
-                        Edit Schedule
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        icon={monthly.isActive ? "Pause" : "Play"}
-                        onClick={() => handlePauseMonthly(monthly.Id)}
-                        className="flex-1"
-                      >
-                        {monthly.isActive ? "Pause" : "Resume"}
-                      </Button>
-                    </div>
+{editingMonthlyId === monthly.Id ? (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 gap-3">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Title
+                            </label>
+                            <input
+                              type="text"
+                              value={editFormData.title || ''}
+                              onChange={(e) => handleInputChange('title', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                              placeholder="Enter booking title"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Pickup Location
+                            </label>
+                            <input
+                              type="text"
+                              value={editFormData.pickupLocation || ''}
+                              onChange={(e) => handleInputChange('pickupLocation', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                              placeholder="Enter pickup location"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Drop Location
+                            </label>
+                            <input
+                              type="text"
+                              value={editFormData.dropLocation || ''}
+                              onChange={(e) => handleInputChange('dropLocation', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                              placeholder="Enter drop location"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Schedule
+                            </label>
+                            <input
+                              type="text"
+                              value={editFormData.schedule || ''}
+                              onChange={(e) => handleInputChange('schedule', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                              placeholder="e.g., Mon-Fri 8:00 AM"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Frequency
+                            </label>
+                            <select
+                              value={editFormData.frequency || ''}
+                              onChange={(e) => handleInputChange('frequency', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                            >
+                              <option value="Daily">Daily</option>
+                              <option value="Weekly">Weekly</option>
+                              <option value="Bi-weekly">Bi-weekly</option>
+                              <option value="Monthly">Monthly</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            icon="Check"
+                            onClick={() => handleSaveMonthly(monthly.Id)}
+                            className="flex-1"
+                          >
+                            Save Changes
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            icon="X"
+                            onClick={handleCancelEdit}
+                            className="flex-1"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          icon="Edit"
+                          onClick={() => handleEditMonthly(monthly)}
+                          className="flex-1"
+                        >
+                          Edit Schedule
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          icon={monthly.isActive ? "Pause" : "Play"}
+                          onClick={() => handlePauseMonthly(monthly.Id)}
+                          className="flex-1"
+                        >
+                          {monthly.isActive ? "Pause" : "Resume"}
+                        </Button>
+                      </div>
+                    )}
                   </Card>
                 </motion.div>
               ))
